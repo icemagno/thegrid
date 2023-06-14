@@ -1,44 +1,34 @@
-// Dynamic examples
-var attitude = $.flightIndicator('#attitude', 'attitude', {
+/*
+		Flight Indicator
+		Author : Sébastien Matton (seb_matton@hotmail.com)
+		https://github.com/sebmatton/jQuery-Flight-Indicators
+		More recent fork:
+		https://github.com/Beta-Technologies/jQuery-Flight-Indicators
+*/
+
+
+var options = {
 	roll:50, 
 	pitch:-20, 
+
+	heading:150, 
+
+	vario:-5, 
+
+	turn:0,
+
 	size:100, 
 	showBox: false,
-	img_directory : 'flightindicators/img/'
-});
+	img_directory : 'flightindicators/img/'	
+}
 
-var heading = $.flightIndicator('#heading', 'heading', {
-	heading:150, 
-	showBox: false,
-	size:100,
-	img_directory : 'flightindicators/img/'
-});
 
-var variometer = $.flightIndicator('#variometer', 'variometer', {
-	vario:-5, 
-	showBox: false,
-	size:100,
-	img_directory : 'flightindicators/img/'
-});
-
-var airspeed = $.flightIndicator('#airspeed', 'airspeed', {
-	showBox: false,
-	size:100,
-	img_directory : 'flightindicators/img/'
-});
-
-var altimeter = $.flightIndicator('#altimeter', 'altimeter', {
-	size:100,
-	showBox: false,
-	img_directory : 'flightindicators/img/'
-});
-
-var turn_coordinator = $.flightIndicator('#turn_coordinator', 'turn_coordinator', {
-	turn:0,
-	size:100,
-	showBox: false,
-	img_directory : 'flightindicators/img/'
-});
+var attitude = $.flightIndicator('#attitude', 'attitude', options );
+var heading = $.flightIndicator('#heading', 'heading', options );
+var variometer = $.flightIndicator('#variometer', 'variometer', options );
+var airspeed = $.flightIndicator('#airspeed', 'airspeed', options );
+var altimeter = $.flightIndicator('#altimeter', 'altimeter', options );
+var turn_coordinator = $.flightIndicator('#turn_coordinator', 'turn_coordinator', options );
 
 // Update at 20Hz
 var increment = 0;
