@@ -4,12 +4,15 @@ import org.json.JSONObject;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+@Service
 public class CommunicatorService {
 
 	@Autowired
@@ -17,6 +20,16 @@ public class CommunicatorService {
 	
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;	
+	
+	@EventListener
+	public void onDisconnectEvent(SessionDisconnectEvent event) {
+		onDisconnect(event);
+	}	 
+	
+	@EventListener
+	public void onSubscribeEvent(SessionSubscribeEvent event) {
+		onSubscribe(event);
+	}	
 	
 	public void broadcastData( String channel, String data ) {
 		
@@ -51,5 +64,15 @@ public class CommunicatorService {
     		e.printStackTrace();
     	}
     }	
-	
+
+    @RabbitListener( queues = {"ping"} )
+    public void receivePing(@Payload String payload) {
+    	try {
+    		JSONObject inputProtocol = new JSONObject( payload );    
+   			System.out.println( inputProtocol.toString(5) );
+    	} catch ( Exception e ) {
+    		e.printStackTrace();
+    	}
+    }	    
+    
 }

@@ -18,7 +18,7 @@ public class CommPingTestService {
 	private void ping() {
 		JSONObject ping = new JSONObject();
 		ping.put("test", Calendar.getInstance().get( Calendar.SECOND ) );
-		comm.broadcastData("main_channel", ping.toString() );
+		comm.broadcastData("ping", ping.toString() );
 	}
 
 }

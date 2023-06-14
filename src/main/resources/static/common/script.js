@@ -11,6 +11,7 @@ $( document ).ready(function() {
 	mainEventHandler = new Cesium.ScreenSpaceEventHandler( scene.canvas );
 	bindInterfaceElements();
 	addMouseHoverListener();
+	connectWs();
 });
 
 
@@ -25,9 +26,17 @@ function connectWs() {
       			console.log(  JSON.parse(message.body)  );
       		}
       	});
-
+      	
+		setInterval( () => {
+			var data = { "test": Date.now() }
+			stompClient.send("/ping", {priority: 0}, JSON.stringify(data) );
+		}, 30000 );       	
+      	
       	
 	});
+    
+    
+    
 }
 
 

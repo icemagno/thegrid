@@ -13,10 +13,14 @@ public class CommController {
 
 	@Autowired private CommunicatorService comm;
 	
-	@MessageMapping("/main_channel")
-	public void broadcastChannel(@Payload String message, MessageHeaders messageHeaders) {
+	@MessageMapping("/ping")
+	public void receivePing(@Payload String message, MessageHeaders messageHeaders) {
 		comm.incommingFromWs( message, messageHeaders );
 	}
 	
+	@MessageMapping("/main_channel")
+	public void receiveData(@Payload String message, MessageHeaders messageHeaders) {
+		comm.incommingFromWs( message, messageHeaders );
+	}	
 	
 }
