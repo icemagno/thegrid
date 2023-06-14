@@ -1,0 +1,79 @@
+<!-- 
+
+jQuery Flight Indicators plugin
+By Sébastien Matton (seb_matton@hotmail.com)
+Published under GPLv3 License.
+
+https://github.com/sebmatton/jQuery-Flight-Indicators
+ 
+ -->
+ <html lang="en" dir="ltr">
+    <head>
+		<link rel="stylesheet" href="adminlte/dist/css/AdminLTE.css">
+        <!-- Flight Indicators library styles -->
+        <link rel="stylesheet" type="text/css" href="flightindicators/flightindicators.css" />
+        <title>Tractable Flight Indicators Plugin</title>
+
+<style>
+
+</style>
+
+    </head>
+    <body>
+        <div>
+            <span id="altimeter"></span>            
+        </div>
+        <!-- Importing jQuery library -->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
+        <!-- Importing the FlightIndicators library -->
+        <script src="flightindicators/jquery.flightindicators.js"></script>
+
+        <!-- Let start our scripts -->
+        <script type="text/javascript">
+            var altimeter = $.flightIndicator('#altimeter', 'altimeter', {img_directory : 'flightindicators/img/'});
+            altimeter.setAltitude(2000);
+            altimeter.setPressure(1013);
+            
+            // For every instrument
+            $('.tract-wrap').each(function(){
+                // Add mouse listener object
+                const mouseEar = {
+                    buttDown: false,
+                    x:false,
+                    y:false,
+                    yDiff:0,
+                    xDiff:0
+                }
+                // Altitude variable
+                let currAlt = window.altitude;
+
+                // Altimeter speed multiplier
+                const altSpeed = 20;
+                // Function reverses boolean to determine mouse up and down
+                // Set coordinates of click as baseline points
+                $(this).on('mousedown',function(e){
+                    mouseEar.buttDown = true;
+                    mouseEar.x = e.pageX;
+                    mouseEar.y = e.pageY;
+                    $(this).parent().css('position','static');
+                }).on('mouseup',function(e){
+                    mouseEar.buttDown = false;
+                    currAlt += mouseEar.yDiff;
+                    $(this).parent().css('position','relative');
+                }).on('mousemove',function(e){
+                    if(e.which === 1 && mouseEar.buttDown){
+                        mouseEar.yDiff = altSpeed * (mouseEar.y - e.pageY);
+                        mouseEar.xDiff = altSpeed * (mouseEar.x - e.pageX);
+                        if(currAlt + mouseEar.yDiff > 0){
+                            altimeter.setAltitude(currAlt + mouseEar.yDiff);
+                        }else{
+                            altimeter.setAltitude(0);
+                        }
+                    }
+                });
+            });
+
+        </script>
+    </body>
+</html>    

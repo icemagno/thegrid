@@ -16,5 +16,11 @@ public class HomeController {
         model.addAttribute("appName", appName);
         return "index";
     }	
-	
+
+    @GetMapping("/inst")
+    public String instTest(Model model) {
+        model.addAttribute("appName", appName);
+        return "indexi";
+    }	    
+    
 }

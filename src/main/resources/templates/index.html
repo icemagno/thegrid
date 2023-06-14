@@ -73,9 +73,20 @@
 		<div class="content-wrapper" style="position: relative; min-height: 600px;">
 			<section style="padding: 0px;" class="content container-fluid">
 				<div class="row">
-					<div style="position:absolute;left:0;height:100%;width:100%;margin:0;overflow:hidden;padding:0;" id="cesiumContainer"></div>
+					<div style="position:absolute;left:0;height:100%;width:100%;margin:0;overflow:hidden;padding:0;" id="cesiumContainer">
+					</div>
 				</div>
 			</section>
+		
+			<div id="indicators" class="example" >
+			    <span id="airspeed"></span>
+			    <span id="attitude"></span>
+			    <span id="altimeter"></span>
+			    <span id="turn_coordinator"></span>
+			    <span id="heading"></span>
+			    <span id="variometer"></span>					
+			</div>		
+			
 		</div>
 
 		<aside class="control-sidebar control-sidebar-light"
@@ -167,7 +178,6 @@
 	<script src="adminlte/bower_components/raphael/raphael.min.js"></script>
 	<script src="adminlte/bower_components/morris.js/morris.min.js"></script>
 
-
 	<!-- InputMask -->
 	<script src="adminlte/plugins/input-mask/jquery.inputmask.js"></script>
 	<script
@@ -187,8 +197,12 @@
 	<script src="common/websocket/sockjs.min.js"></script>
 	<script src="common/websocket/stomp.min.js"></script>
 
+	<!-- FlightIndicators -->
+	<script src="flightindicators/jquery.flightindicators.js"></script>
+
 	<script src="Cesium/Cesium.js"></script>
 	<script src="common/utmconvert.js"></script>
+	<script src="common/flightmanager.js"></script>
 	<script src="common/script.js"></script>
 
 </body>
