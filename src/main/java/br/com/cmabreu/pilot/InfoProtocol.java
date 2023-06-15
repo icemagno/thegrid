@@ -18,6 +18,9 @@ public class InfoProtocol {
 	private double targetAzimuth;
 	private double error;	
 	private int rudderPosition;
+	private int roll;
+	private int pitch;
+	private double altitude;
 
 	public InfoProtocol(String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
 			double headingMagnetic, double speedKM, double speedKN, double relativeWindSpeed, double trueWindSpeed, 
@@ -35,6 +38,9 @@ public class InfoProtocol {
 		this.trueWindSpeed = trueWindSpeed;
 		this.apparentWindSpeed = apparentWindSpeed;
 		this.apparentWindAngle = apparentWindAngle;
+		this.roll = this.rudderPosition;
+		this.pitch = 0;
+		this.altitude = 10000;
 	}
 	
 	public String getUuid() {
@@ -51,6 +57,7 @@ public class InfoProtocol {
 
 	public void setRudderPosition(int rudderPosition) {
 		this.rudderPosition = rudderPosition;
+		this.roll = this.rudderPosition;
 	}
 
 	public void setCurrentAzimuth(double currentAzimuth) {
@@ -120,7 +127,17 @@ public class InfoProtocol {
 	public double getApparentWindAngle() {
 		return apparentWindAngle;
 	}
+
+	public int getRoll() {
+		return roll;
+	}
+
+	public int getPitch() {
+		return pitch;
+	}
 	
-	
+	public double getAltitude() {
+		return altitude;
+	}
 	
 }

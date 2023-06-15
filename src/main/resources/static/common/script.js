@@ -64,7 +64,7 @@ function initMap(){
 		});
 			
 		viewer = new Cesium.Viewer('cesiumContainer',{
-			sceneMode : Cesium.SceneMode.SCENE2D,
+			sceneMode : Cesium.SceneMode.SCENE3D,
 			timeline: false,
 			animation: false,
 			baseLayerPicker: false,
@@ -74,7 +74,7 @@ function initMap(){
 			homeButton : false,
 			infoBox : false,
 			skyBox : false,
-			sceneModePicker : false,
+			sceneModePicker : true,
 			selectionIndicator : false,
 			navigationHelpButton : false,
 		    imageryProvider: baseOsmProvider,

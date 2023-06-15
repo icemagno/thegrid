@@ -25,24 +25,27 @@ var indicators = {
 	turnCoordinator : null
 }
 
-var defaultAltitude = 10000;
+
 var airplanes = [];
 
 // http://localhost:8080/pilot/setspeed?speed=500&uuid=7908dd58-b9bf-4e81-963e-d366dcd5877e
-// http://localhost:8080/pilot/setheading?heading=15&uuid=2698a65a-2ab6-4163-95d7-daa77e2618c1
-// http://localhost:8080/pilot/setpid?p=0.0&i=0.009&d=5.0&uuid=ce5dee82-7263-4146-b483-aaa335f46abd
+// http://localhost:8080/pilot/setheading?heading=15&uuid=aa4689aa-d5da-43e0-afbc-e885a8799f63
+// http://localhost:8080/pilot/setpid?p=0.01&i=0.0005&d=0.00009&uuid=a7b57445-b5f9-4828-93fb-8a74a7f2d07a
 
 function updatePlanes( payload ){
 	indicators.variometer.setVario( ( payload.rudderPosition / 10 ) * 4 );
 	indicators.heading.setHeading( payload.currentAzimuth );
 	indicators.airspeed.setAirSpeed( payload.speedKM * 10 );
-	indicators.altimeter.setAltitude( defaultAltitude );
+	indicators.altimeter.setAltitude( payload.altitude );
 	
-	var thePosition = Cesium.Cartesian3.fromDegrees( payload.longitude, payload.latitude, defaultAltitude );					
+    indicators.attitude.setRoll( payload.roll * 5 );
+    indicators.attitude.setPitch( payload.pitch );
+	indicators.turnCoordinator.setTurn( payload.roll * 5 );
+	
+	var thePosition = Cesium.Cartesian3.fromDegrees( payload.longitude, payload.latitude, payload.altitude );					
 	var heading = Cesium.Math.toRadians( payload.currentAzimuth - 90 );
-	
-	var pitch = Cesium.Math.toRadians(0.0);
-	var roll = Cesium.Math.toRadians(0.0);
+	var pitch = Cesium.Math.toRadians( payload.pitch );
+	var roll = Cesium.Math.toRadians( payload.roll );
 	var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
 	var theOrientation = Cesium.Transforms.headingPitchRollQuaternion(thePosition, hpr);	
 	
@@ -67,7 +70,7 @@ function updatePlanes( payload ){
 				uri: 'common/models/air.glb',
 				minimumPixelSize : 128,
 				maximumScale : 500,
-				color: Cesium.Color.RED
+				//color: Cesium.Color.RED
 
 			}/*,
 			label: {
@@ -81,6 +84,7 @@ function updatePlanes( payload ){
 		});
 		airplanes.push( airPlane );
 		viewer.entities.add( airPlane );
+		viewer.trackedEntity = airPlane;
 	}	
 	
 }
