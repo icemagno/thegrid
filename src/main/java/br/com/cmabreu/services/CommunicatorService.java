@@ -1,5 +1,7 @@
 package br.com.cmabreu.services;
 
+import java.util.Calendar;
+
 import org.json.JSONObject;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -31,13 +33,14 @@ public class CommunicatorService {
 		onSubscribe(event);
 	}	
 	
-	public void broadcastData( String channel, String data ) {
+	public void broadcastData( String channel, JSONObject data ) throws Exception {
+		data.put("timestamp", Calendar.getInstance().getTimeInMillis() );
 		
 		// To Rabbit-MQ
-		rabbitTemplate.convertAndSend( channel, data );
+		rabbitTemplate.convertAndSend( channel, data.toString() );
 		
     	// To websocket
-    	messagingTemplate.convertAndSend("/" + channel, data );
+    	messagingTemplate.convertAndSend("/" + channel, data.toString() );
 	}
 
 	public void onDisconnect(SessionDisconnectEvent event) {
@@ -58,8 +61,8 @@ public class CommunicatorService {
     @RabbitListener( queues = {"main_channel"} )
     public void receive(@Payload String payload) {
     	try {
-    		JSONObject inputProtocol = new JSONObject( payload );    
-   			System.out.println( inputProtocol.toString(5) );
+    		// JSONObject inputProtocol = new JSONObject( payload );    
+   			//System.out.println( inputProtocol.toString(5) );
     	} catch ( Exception e ) {
     		e.printStackTrace();
     	}
@@ -68,8 +71,7 @@ public class CommunicatorService {
     @RabbitListener( queues = {"ping"} )
     public void receivePing(@Payload String payload) {
     	try {
-    		JSONObject inputProtocol = new JSONObject( payload );    
-   			System.out.println( inputProtocol.toString(5) );
+   			System.out.println( "PING RECEIVED!" );
     	} catch ( Exception e ) {
     		e.printStackTrace();
     	}

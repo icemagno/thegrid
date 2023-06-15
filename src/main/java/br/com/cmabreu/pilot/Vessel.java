@@ -5,8 +5,7 @@
 package br.com.cmabreu.pilot;
 
 import java.util.Random;
-
-import br.com.cmabreu.pilot.observers.InfoObserver;
+import java.util.UUID;
 
 /**
  * @author Tony Mattheys
@@ -16,9 +15,9 @@ public class Vessel extends Thread {
 	private double rudderFactor;
 	private double rudderPosition;
 	private double throttlePosition;
-	private double interval;
+	private int interval;
 	private double hullSpeed;
-	private double boatSpeed;
+	private double speed;
 	private double heading;
 	private double latitude;
 	private double longitude;
@@ -28,8 +27,12 @@ public class Vessel extends Thread {
 	private double earthRadius = 3443.89849;
 	private GPSSimulator GPS;
 	private Random generator = new Random(System.nanoTime());
-
-	public double getInterval() {
+	private AutoPilot pilot = null;
+	private String uuid;
+	private double targetAzimuth;
+	private double error;	
+	
+	public int getInterval() {
 		return interval;
 	}	
 	
@@ -43,33 +46,70 @@ public class Vessel extends Thread {
 	/**
 	 * Initialize the Simulation
 	 */
-	public Vessel(InfoObserver observer, double intv, int ship, double spd, double hdg, 
-			double lat, double lon, double alt, double rud, double thr, double rudderFactor) {
-		
-		
-		double hullspeed = calcHullSpeed( ship );
-		
+	public Vessel( IVesselObserver pilotObs, double lat, double lon, double rudderFactor) {
 		this.rudderFactor = rudderFactor;
-		this.GPS = new GPSSimulator( observer );
-		this.interval = intv;
-		this.hullSpeed = hullspeed;
-		this.boatSpeed = spd;
-		this.heading = hdg;
+		this.uuid = UUID.randomUUID().toString();
+		this.interval = 50;
+		this.GPS = new GPSSimulator( uuid, pilotObs, this.interval );
+		this.hullSpeed = calcHullSpeed( 10 ); // 90 = ship length
+		this.speed = 0.0;
+		this.heading = 0.0;
 		this.latitude = lat;
 		this.longitude = lon;
-		this.rudderPosition = rud;
-		this.throttlePosition = thr;
+		this.rudderPosition = 0;
+		this.throttlePosition = 0;
 		this.trueWindDirection = generator.nextDouble() * 360;
 		this.trueWindSpeed = generator.nextDouble() * 20.0 + 5.0;
 		this.GPS.start();
+		
+		this.pilot = new AutoPilot( 0.0, 0.01, 5.0, this );
+		pilot.start();
 	}
+	
+	public void setError( double error ) {
+		this.error = error;
+	}
+	
+	public double getRudderFactor() {
+		return rudderFactor;
+	}
+	
+	public double getTargetAzimuth() {
+		return targetAzimuth;
+	}
+	
+	public double getError() {
+		return error;
+	}
+	
+	public String getUuid() {
+		return uuid;
+	}
+	
+	public void setPid( double p, double i, double d ) {
+		pilot.setPid(p,i,d);
+	}	
 
-	public void setRudderPosition(int p) {
+	public void setCourseTo(double heading) {
+		this.targetAzimuth = heading;
+		pilot.setCourseTo( heading );
+	}
+	
+	public void setRudderFactor(double rudderFactor) {
+		this.rudderFactor = rudderFactor;
+	}
+	
+	public void setInterval(int interval) {
+		this.interval = interval;
+		GPS.setUpdateSpeed( interval );
+	}
+	
+	public void setRudderPosition(double p) {
 		rudderPosition = p;
 	}
 	
-	public int getRudderPosition() {
-		return ( (Double)rudderPosition ).intValue();
+	public double getRudderPosition() {
+		return rudderPosition;
 	}	
 
 	public void setThrottlePosition(double t) {
@@ -88,8 +128,8 @@ public class Vessel extends Thread {
 		return heading;
 	}
 
-	public double getBoatSpeed() {
-		return ((Double)boatSpeed).intValue();
+	public double getSpeed() {
+		return speed;
 	}
 
 	public double getHeadingMagnetic() {
@@ -122,9 +162,9 @@ public class Vessel extends Thread {
 			 * SO unrealistic.
 			 */
 			if (throttlePosition >= 0) {
-				boatSpeed = boatSpeed + (((hullSpeed * throttlePosition / 100) - boatSpeed) / 2);
+				speed = speed + (((hullSpeed * throttlePosition / 100) - speed) / 2);
 			}
-			GPS.setBoatSpeed(boatSpeed);
+			GPS.setSpeed(speed);
 
 			/**
 			 * Turn the boat in the direction indicated by the rudder. We multiply the
@@ -132,7 +172,7 @@ public class Vessel extends Thread {
 			 * he end we need to make sure we have not gone through 360 degrees in one
 			 * direction or the other and correct as necessary.
 			 */
-			if (rudderPosition != 0 && boatSpeed != 0) {
+			if (rudderPosition != 0 && speed != 0) {
 				heading = heading + rudderPosition * rudderFactor;
 			}
 			if (heading < 0) {
@@ -174,7 +214,7 @@ public class Vessel extends Thread {
 			 * (d/R is the angular distance, in radians)
 			 * 
 			 */
-			displacement = boatSpeed * interval / 3600;
+			displacement = speed * interval / 3600;
 			double p2 = Math.asin(Math.sin(Math.toRadians(latitude)) * Math.cos(displacement / earthRadius) + Math.cos(Math.toRadians(latitude)) * Math.sin(displacement / earthRadius) * Math.cos(Math.toRadians(heading)));
 			latitude = Math.toDegrees(p2);
 			GPS.setLatitude(latitude);
@@ -183,7 +223,7 @@ public class Vessel extends Thread {
 			GPS.setLongitude(longitude);
 			
 			try {
-				Thread.sleep((long) interval * 1000);
+				Thread.sleep((long) interval);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

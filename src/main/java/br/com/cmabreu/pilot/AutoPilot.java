@@ -1,35 +1,36 @@
 package br.com.cmabreu.pilot;
 
-import br.com.cmabreu.pilot.observers.PilotObserver;
-
 public class AutoPilot extends Thread {
 	private MiniPID miniPID; 
 	private Vessel ship;
 	private double targetAzimuth;
 	private double currentAzimuth;
 	private Double rudderPosition;
-	private PilotObserver observer;
 	private double error;
 	
 	private final int RUDDER_LIMIT = 5; // Limite do leme ( -5 ate 5 )
-	private final int RUDDER_STEP = 1;  // O quando o leme se desloca por vez em graus. Max = 5
+	private final double RUDDER_STEP = 1;  // O quando o leme se desloca por vez em graus. Max = 5
 	
 	
-	public AutoPilot( Vessel ship ) {
-		double targetAzimuth = ship.getHeading();
+	public AutoPilot( double p, double i, double d,  Vessel ship ) {
 		this.ship = ship;
-		this.miniPID = new MiniPID(0.5, 0.1, 0.5); 
+		this.miniPID = new MiniPID(p,i,d); 
 		this.miniPID.setOutputLimits( RUDDER_LIMIT );
 		this.miniPID.setOutputRampRate( RUDDER_STEP );
 		this.miniPID.setSetpointRange(360);		
 		this.miniPID.setSetpoint( targetAzimuth );
-		this.targetAzimuth = targetAzimuth;
+		this.targetAzimuth = ship.getHeading();
 		this.currentAzimuth =  targetAzimuth;
 	}
 	
-
-	public void setCourseTo( double azimuth ) {
-		this.targetAzimuth = azimuth;
+	public void setPid( double p, double i, double d ) {
+		miniPID.setP(p);
+		miniPID.setI(i);
+		miniPID.setD(d);
+	}
+	
+	public void setCourseTo( double targetAzimuth ) {
+		this.targetAzimuth = targetAzimuth;
 	}
 	
 	public double getTargetAzimuth() {
@@ -44,30 +45,18 @@ public class AutoPilot extends Thread {
 		return this.rudderPosition.intValue();
 	}
 	
-	public double getError() {
-		return this.error;
-	}
-	
-	public void setObserver( PilotObserver observer ) {
-		this.observer = observer;
-	}
 	
 	@Override
 	public void run() {
 		
 		while (true) {
-			
 			rudderPosition = miniPID.getOutput(currentAzimuth, targetAzimuth);
-			ship.setRudderPosition( rudderPosition.intValue()  );
+			ship.setRudderPosition( rudderPosition );
 			currentAzimuth =  ship.getHeading();
 			error = targetAzimuth - currentAzimuth;
-			
-			if( observer != null ) {
-				observer.log(rudderPosition.intValue(), currentAzimuth, targetAzimuth, error);
-			}
-			
+			ship.setError( error );
 			try {
-				Thread.sleep( (long) ship.getInterval() * 1000 );
+				Thread.sleep( (long) ship.getInterval() );
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}				

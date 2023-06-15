@@ -1,34 +1,76 @@
 package br.com.cmabreu.pilot;
 
 public class InfoProtocol {
+	private String uuid;
 	private double latitude;
 	private double longitude;
 	private String latChar;
 	private String lonChar;
-	private String headingTrueS;
-	private String headingMagneticS;
-	private String boatSpeedS;
-	private String boatSpeedKN;
-	private String relativeWindSpeedS;
-	private String trueWindSpeedS;
-	private String apparentWindSpeed;
-	private String apparentWindAngle;
+	private double headingTrue;
+	private double headingMagnetic;
+	private double speedKM;
+	private double speedKN;
+	private double relativeWindSpeed;
+	private double trueWindSpeed;
+	private double apparentWindSpeed;
+	private double apparentWindAngle;
+	private double currentAzimuth;
+	private double targetAzimuth;
+	private double error;	
+	private double rudderPosition;
 
-	public InfoProtocol(double latitude, double longitude, String latChar, String lonChar, String headingTrueS, 
-			String headingMagneticS, String boatSpeedS, String boatSpeedKN, String relativeWindSpeedS, String trueWindSpeedS, 
-			String apparentWindSpeed, String apparentWindAngle ) {
+	public InfoProtocol(String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
+			double headingMagnetic, double speedKM, double speedKN, double relativeWindSpeed, double trueWindSpeed, 
+			double apparentWindSpeed, double apparentWindAngle ) {
 		this.latChar = latChar;
+		this.uuid = uuid;
 		this.latitude = latitude;
 		this.lonChar = lonChar;
 		this.longitude = longitude;
-		this.headingTrueS = headingTrueS;
-		this.headingMagneticS = headingMagneticS;
-		this.boatSpeedS = boatSpeedS;
-		this.boatSpeedKN = boatSpeedKN;
-		this.relativeWindSpeedS = relativeWindSpeedS;
-		this.trueWindSpeedS = trueWindSpeedS;
+		this.headingTrue = headingTrue;
+		this.headingMagnetic = headingMagnetic;
+		this.speedKM = speedKM;
+		this.speedKN = speedKN;
+		this.relativeWindSpeed = relativeWindSpeed;
+		this.trueWindSpeed = trueWindSpeed;
 		this.apparentWindSpeed = apparentWindSpeed;
 		this.apparentWindAngle = apparentWindAngle;
+	}
+	
+	public String getUuid() {
+		return uuid;
+	}
+
+	public double getCurrentAzimuth() {
+		return currentAzimuth;
+	}
+	
+	public double getRudderPosition() {
+		return rudderPosition;
+	}
+
+	public void setRudderPosition(double rudderPosition) {
+		this.rudderPosition = rudderPosition;
+	}
+
+	public void setCurrentAzimuth(double currentAzimuth) {
+		this.currentAzimuth = currentAzimuth;
+	}
+
+	public double getTargetAzimuth() {
+		return targetAzimuth;
+	}
+
+	public void setTargetAzimuth(double targetAzimuth) {
+		this.targetAzimuth = targetAzimuth;
+	}
+
+	public double getError() {
+		return error;
+	}
+
+	public void setError(double error) {
+		this.error = error;
 	}
 
 	public double getLatitude() {
@@ -47,35 +89,35 @@ public class InfoProtocol {
 		return lonChar;
 	}
 
-	public String getHeadingTrueS() {
-		return headingTrueS;
+	public double getHeadingTrue() {
+		return headingTrue;
 	}
 
-	public String getHeadingMagneticS() {
-		return headingMagneticS;
+	public double getHeadingMagnetic() {
+		return headingMagnetic;
 	}
 
-	public String getBoatSpeedS() {
-		return boatSpeedS;
+	public double getSpeedKM() {
+		return speedKM;
 	}
 
-	public String getBoatSpeedKN() {
-		return boatSpeedKN;
+	public double getSpeedKN() {
+		return speedKN;
 	}
 
-	public String getRelativeWindSpeedS() {
-		return relativeWindSpeedS;
+	public double getRelativeWindSpeed() {
+		return relativeWindSpeed;
 	}
 
-	public String getTrueWindSpeedS() {
-		return trueWindSpeedS;
+	public double getTrueWindSpeed() {
+		return trueWindSpeed;
 	}
 
-	public String getApparentWindSpeed() {
+	public double getApparentWindSpeed() {
 		return apparentWindSpeed;
 	}
 
-	public String getApparentWindAngle() {
+	public double getApparentWindAngle() {
 		return apparentWindAngle;
 	}
 	

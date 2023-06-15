@@ -7,6 +7,7 @@ var homeLocation = Cesium.Rectangle.fromDegrees(west, south, east, north);
 var mainEventHandler = null;
 
 $( document ).ready(function() {
+	initIndicators();
 	initMap();
 	mainEventHandler = new Cesium.ScreenSpaceEventHandler( scene.canvas );
 	bindInterfaceElements();
@@ -14,6 +15,14 @@ $( document ).ready(function() {
 	connectWs();
 });
 
+function initIndicators(){
+	indicators.attitude = $.flightIndicator('#attitude', 'attitude', options );
+	indicators.heading = $.flightIndicator('#heading', 'heading', options );
+	indicators.variometer = $.flightIndicator('#variometer', 'variometer', options );
+	indicators.airspeed = $.flightIndicator('#airspeed', 'airspeed', options );
+	indicators.altimeter = $.flightIndicator('#altimeter', 'altimeter', options );
+	indicators.turnCoordinator = $.flightIndicator('#turn_coordinator', 'turn_coordinator', options );	
+}
 
 function connectWs() {
 	const ws2 = new SockJS( '/ws' );
@@ -22,16 +31,24 @@ function connectWs() {
     stompClient.connect({}, (frame) => {
     	
       	stompClient.subscribe('/ping', (message) => {
-      		if(message.body) {
-      			console.log(  JSON.parse(message.body)  );
-      		}
+      		console.log("PING RECEIVED!");
       	});
+
       	
+      	stompClient.subscribe('/main_channel', (message) => {
+      		if(message.body) {
+      			var payload = JSON.parse(message.body);
+      			// flightmamager.js
+      			updatePlanes( payload ); 
+      		}
+      	});      	
+      	
+      	/*
 		setInterval( () => {
 			var data = { "test": Date.now() }
 			stompClient.send("/ping", {priority: 0}, JSON.stringify(data) );
 		}, 30000 );       	
-      	
+      	*/
       	
 	});
     
@@ -61,7 +78,8 @@ function initMap(){
 			selectionIndicator : false,
 			navigationHelpButton : false,
 		    imageryProvider: baseOsmProvider,
-		    requestRenderMode : true,
+		    requestRenderMode : false,
+		    shouldAnimate : true
 		});
 		
 		camera = viewer.camera;
