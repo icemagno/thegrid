@@ -7,7 +7,6 @@ public class AutoPilot extends Thread {
 	private double currentAzimuth;
 	private Double rudderPosition;
 	private double error;
-	
 	private final int RUDDER_LIMIT = 5; // Limite do leme ( -5 ate 5 )
 	private final double RUDDER_STEP = 1;  // O quando o leme se desloca por vez em graus. Max = 5
 	

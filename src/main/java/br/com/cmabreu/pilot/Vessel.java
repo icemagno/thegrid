@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 public class Vessel extends Thread {
 	private double rudderFactor;
-	private double rudderPosition;
+	private int rudderPosition;
 	private double throttlePosition;
 	private int interval;
 	private double hullSpeed;
@@ -46,8 +46,8 @@ public class Vessel extends Thread {
 	/**
 	 * Initialize the Simulation
 	 */
-	public Vessel( IVesselObserver pilotObs, double lat, double lon, double rudderFactor) {
-		this.rudderFactor = rudderFactor;
+	public Vessel( IVesselObserver pilotObs, double lat, double lon ) {
+		this.rudderFactor = 1.0;
 		this.uuid = UUID.randomUUID().toString();
 		this.interval = 50;
 		this.GPS = new GPSSimulator( uuid, pilotObs, this.interval );
@@ -61,7 +61,6 @@ public class Vessel extends Thread {
 		this.trueWindDirection = generator.nextDouble() * 360;
 		this.trueWindSpeed = generator.nextDouble() * 20.0 + 5.0;
 		this.GPS.start();
-		
 		this.pilot = new AutoPilot( 0.0, 0.01, 5.0, this );
 		pilot.start();
 	}
@@ -104,11 +103,11 @@ public class Vessel extends Thread {
 		GPS.setUpdateSpeed( interval );
 	}
 	
-	public void setRudderPosition(double p) {
-		rudderPosition = p;
+	public void setRudderPosition(Double p) {
+		rudderPosition = p.intValue();
 	}
 	
-	public double getRudderPosition() {
+	public int getRudderPosition() {
 		return rudderPosition;
 	}	
 

@@ -17,7 +17,7 @@ public class InfoProtocol {
 	private double currentAzimuth;
 	private double targetAzimuth;
 	private double error;	
-	private double rudderPosition;
+	private int rudderPosition;
 
 	public InfoProtocol(String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
 			double headingMagnetic, double speedKM, double speedKN, double relativeWindSpeed, double trueWindSpeed, 
@@ -45,11 +45,11 @@ public class InfoProtocol {
 		return currentAzimuth;
 	}
 	
-	public double getRudderPosition() {
+	public int getRudderPosition() {
 		return rudderPosition;
 	}
 
-	public void setRudderPosition(double rudderPosition) {
+	public void setRudderPosition(int rudderPosition) {
 		this.rudderPosition = rudderPosition;
 	}
 

@@ -22,7 +22,7 @@ public class VesselService implements IVesselObserver {
 	@PostConstruct
 	private void init() {
 		this.vessels = new HashMap<String, Vessel>();
-		Vessel vessel = new Vessel( this , -22.9001, -43.1388, 2.0 );
+		Vessel vessel = new Vessel( this , -22.9001, -43.1388, 1.0 );
 		this.vessels.put( vessel.getUuid(), vessel );
 		vessel.setThrottlePosition( 50 );
 		vessel.start();		
