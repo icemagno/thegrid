@@ -7,8 +7,8 @@ public class AutoPilot extends Thread {
 	private double currentAzimuth;
 	private Double rudderPosition;
 	private double error;
-	private final int RUDDER_LIMIT = 5; // Limite do leme ( -5 ate 5 )
-	private final double RUDDER_STEP = 1;  // O quando o leme se desloca por vez em graus. Max = 5
+	private final int RUDDER_LIMIT = 10; // Limite do leme ( -5 ate 5 )
+	private final double RUDDER_STEP = 0.1;  // O quando o leme se desloca por vez em graus. Max = 5
 	
 	
 	public AutoPilot( double p, double i, double d,  Vessel ship ) {
@@ -16,7 +16,7 @@ public class AutoPilot extends Thread {
 		this.miniPID = new MiniPID(p,i,d); 
 		this.miniPID.setOutputLimits( RUDDER_LIMIT );
 		this.miniPID.setOutputRampRate( RUDDER_STEP );
-		this.miniPID.setSetpointRange(360);		
+		this.miniPID.setSetpointRange(360);
 		this.miniPID.setSetpoint( targetAzimuth );
 		this.targetAzimuth = ship.getHeading();
 		this.currentAzimuth =  targetAzimuth;

@@ -30,7 +30,9 @@ var airplanes = [];
 
 // http://localhost:8080/pilot/setspeed?speed=500&uuid=7908dd58-b9bf-4e81-963e-d366dcd5877e
 // http://localhost:8080/pilot/setheading?heading=15&uuid=aa4689aa-d5da-43e0-afbc-e885a8799f63
-// http://localhost:8080/pilot/setpid?p=0.01&i=0.0005&d=0.00009&uuid=a7b57445-b5f9-4828-93fb-8a74a7f2d07a
+// http://localhost:8080/pilot/setpid?p=0.015&i=0.00008&d=0.00009&uuid=0dbbca06-78a7-4ab4-a94e-dbbd193ab543
+// http://localhost:8080/pilot/setpid?p=0.015&i=0.00001&d=0.05&uuid=0dbbca06-78a7-4ab4-a94e-dbbd193ab543
+// http://localhost:8080/pilot/setpid?p=0.02&i=0.00001&d=0.005&uuid=e82fa3ee-0ba1-4e9b-b072-988cfd47f955
 
 function updatePlanes( payload ){
 	indicators.variometer.setVario( ( payload.rudderPosition / 10 ) * 4 );
@@ -89,31 +91,3 @@ function updatePlanes( payload ){
 	
 }
 
-
-// Update at 20Hz
-var increment = 0;
-/*
-setInterval(function() {
-    // Airspeed update
-    airspeed.setAirSpeed(80+80*Math.sin(increment/10));
-
-    // Attitude update
-    attitude.setRoll(30*Math.sin(increment/10));
-    attitude.setPitch(50*Math.sin(increment/20));
-
-    // Altimeter update
-    altimeter.setAltitude(10*increment);
-    altimeter.setPressure(1000+3*Math.sin(increment/50));
-    increment++;
-    
-    // TC update
-    turn_coordinator.setTurn(30*Math.sin(increment/10));
-
-    // Heading update
-    heading.setHeading(increment);
-    
-    // Vario update
-    variometer.setVario(2*Math.sin(increment/10));
-    
-}, 50);   
-*/
