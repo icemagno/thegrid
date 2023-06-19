@@ -16,13 +16,16 @@ public class InfoProtocol {
 	private double apparentWindAngle;
 	private double currentAzimuth;
 	private double targetAzimuth;
-	private double error;	
+	private double rudderError;	
 	private int rudderPosition;
+	private int elevatorPosition;
 	private int roll;
 	private int pitch;
 	private double altitude;
+	private double elevatorError;
+	private double targetAltitude;
 
-	public InfoProtocol(String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
+	public InfoProtocol(double altitude, String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
 			double headingMagnetic, double speedKM, double speedKN, double relativeWindSpeed, double trueWindSpeed, 
 			double apparentWindSpeed, double apparentWindAngle ) {
 		this.latChar = latChar;
@@ -39,8 +42,8 @@ public class InfoProtocol {
 		this.apparentWindSpeed = apparentWindSpeed;
 		this.apparentWindAngle = apparentWindAngle;
 		this.roll = this.rudderPosition;
-		this.pitch = 0;
-		this.altitude = 10000;
+		this.pitch = this.elevatorPosition;
+		this.altitude = altitude;
 	}
 	
 	public String getUuid() {
@@ -60,6 +63,11 @@ public class InfoProtocol {
 		this.roll = this.rudderPosition;
 	}
 
+	public void setElevatorPosition(int elevatorPosition) {
+		this.elevatorPosition = elevatorPosition;
+		this.pitch = this.elevatorPosition;
+	}
+
 	public void setCurrentAzimuth(double currentAzimuth) {
 		this.currentAzimuth = currentAzimuth;
 	}
@@ -72,12 +80,12 @@ public class InfoProtocol {
 		this.targetAzimuth = targetAzimuth;
 	}
 
-	public double getError() {
-		return error;
+	public double getRudderError() {
+		return rudderError;
 	}
 
-	public void setError(double error) {
-		this.error = error;
+	public void setRudderError(double error) {
+		this.rudderError = error;
 	}
 
 	public double getLatitude() {
@@ -138,6 +146,23 @@ public class InfoProtocol {
 	
 	public double getAltitude() {
 		return altitude;
+	}
+
+	public void setElevatorError(double elevatorError) {
+		this.elevatorError = elevatorError;
+	}
+	
+	public double getElevatorError() {
+		return elevatorError;
+	}
+
+	public void setTargetAltitude(double targetAltitude) {
+		this.targetAltitude = targetAltitude;
+		
+	}
+	
+	public double getTargetAltitude() {
+		return targetAltitude;
 	}
 	
 }

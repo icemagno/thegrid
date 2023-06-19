@@ -1,8 +1,8 @@
 package br.com.cmabreu.pilot;
 
-public class AutoPilot extends Thread {
+public class Rudder extends Thread {
 	private MiniPID miniPID; 
-	private Vessel ship;
+	private Airplane airplane;
 	private double targetAzimuth;
 	private double currentAzimuth;
 	private Double rudderPosition;
@@ -11,15 +11,15 @@ public class AutoPilot extends Thread {
 	private final double RUDDER_STEP = 0.1;  // O quando o leme se desloca por vez em graus. Max = 5
 	
 	
-	public AutoPilot( double p, double i, double d,  Vessel ship ) {
-		this.ship = ship;
+	public Rudder( double p, double i, double d,  Airplane airplane ) {
+		this.airplane = airplane;
 		this.miniPID = new MiniPID(p,i,d); 
 		this.miniPID.setOutputLimits( RUDDER_LIMIT );
 		this.miniPID.setOutputRampRate( RUDDER_STEP );
 		this.miniPID.setSetpointRange(360);
-		this.miniPID.setSetpoint( targetAzimuth );
-		this.targetAzimuth = ship.getHeading();
+		this.targetAzimuth = airplane.getHeading();
 		this.currentAzimuth =  targetAzimuth;
+		this.miniPID.setSetpoint( targetAzimuth );
 	}
 	
 	public void setPid( double p, double i, double d ) {
@@ -50,12 +50,12 @@ public class AutoPilot extends Thread {
 		
 		while (true) {
 			rudderPosition = miniPID.getOutput(currentAzimuth, targetAzimuth);
-			ship.setRudderPosition( rudderPosition );
-			currentAzimuth =  ship.getHeading();
+			airplane.setRudderPosition( rudderPosition );
+			currentAzimuth =  airplane.getHeading();
 			error = targetAzimuth - currentAzimuth;
-			ship.setError( error );
+			airplane.setRudderError( error );
 			try {
-				Thread.sleep( (long) ship.getInterval() );
+				Thread.sleep( (long) airplane.getSimulationSpeed() );
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}				

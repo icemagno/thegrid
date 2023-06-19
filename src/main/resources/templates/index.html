@@ -73,6 +73,14 @@
 		<div class="content-wrapper" style="position: relative; min-height: 600px;">
 			<section style="padding: 0px;" class="content container-fluid">
 				<div class="row">
+					<div style="position: absolute;bottom: 0px; right: 500px; z-index: 999; width: 200px; cursor: pointer;">
+						<table style="width:200px;height:200px; background-image: url('common/img/pad.png');background-repeat: no-repeat; background-size: 100% auto "   >
+							<tr><td style="width:33%"></td><td onclick="planeUp()" style="width:33%"></td><td style="width:33%"></td></tr>
+							<tr><td onclick="planeLeft()" style="width:33%"></td><td style="width:33%"></td><td onclick="planeRight()" style="width:33%"></td></tr>
+							<tr><td style="width:33%"></td><td onclick="planeDown()" style="width:33%"></td><td style="width:33%"></td></tr>
+						</table>
+					</div>
+					
 					<div style="position:absolute;left:0;height:100%;width:100%;margin:0;overflow:hidden;padding:0;" id="cesiumContainer">
 					</div>
 				</div>
@@ -113,13 +121,16 @@
 							<div id="lyrCount" style="width: 50px; float: left">0</div>
 						</div>
 					</td>
-
+					<td style="width:40px">Altitude:</td>
+					<td style="width:70px" title="Altitude" id="mapAlt"></td>
 					<td style="width:40px">Latitude:</td>
 					<td style="width:70px" title="Latitude" id="mapLat"></td>
 					<td style="width:70px" title="Latitude" id="mapHdmsLat"></td>
 				</tr>
 				<tr>
-					<td>&nbsp;</td>
+					<td>magno.mabreu@gmail.com</td>
+					<td>Heading:</td>
+					<td style="width:70px" title="Heading" id="mapHead"></td>
 					<td style="width:40px">Longitude:</td>
 					<td style="width:70px" title="Longitude" id="mapLon"></td>
 					<td style="width:70px" title="Longitude" id="mapHdmsLon"></td>

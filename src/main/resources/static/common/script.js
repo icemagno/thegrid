@@ -170,12 +170,12 @@ function bindInterfaceElements() {
 
 
 function addMouseHoverListener() {
-
+	
+	/*
 	mainEventHandler.setInputAction( function(movement) {
 		var position = getMapPosition3D2D( movement.endPosition );
 		$('#cesiumContainer').css('cursor','default');
 		try {
-			if ( position ) updatePanelFooter( position );
 			const pickedObject = this.viewer.scene.pick( movement.endPosition );
 		    if ( Cesium.defined( pickedObject ) ) {
 				const entity = pickedObject.id;
@@ -185,6 +185,7 @@ function addMouseHoverListener() {
 			console.log( err );
 		}
 	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE );
+	*/
 	
 	mainEventHandler.setInputAction( function( movement ) {
 		try {
@@ -202,28 +203,6 @@ function addMouseHoverListener() {
 	
 	
 };
-
-function updatePanelFooter( position ) {
-	cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic( position );
-	var longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(10);
-	var latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(10);    	    
-	mapPointerLatitude = latitudeString.slice(-15);
-	mapPointerLongitude = longitudeString.slice(-15);
-	var coordHDMS = convertDMS(mapPointerLatitude,mapPointerLongitude);
-	$("#mapLat").text( mapPointerLatitude );
-	$("#mapLon").text( mapPointerLongitude );
-	var utmVal = fromLatLon( parseFloat(mapPointerLatitude), parseFloat(mapPointerLongitude));
-	var easting = utmVal.easting + "";
-	var northing = utmVal.northing + "";
-	var eaArr = easting.split(".");
-	var noArr = northing.split(".");
-	var eaDec = eaArr[1].substring(0,2);
-	var noDec = noArr[1].substring(0,2);
-	$("#mapHdmsLat").text( coordHDMS.lat + " " + coordHDMS.latCard );
-	$("#mapHdmsLon").text( coordHDMS.lon + " " + coordHDMS.lonCard );
-	$("#mapGeohash").text( "" );
-	$("#mapUtm").text( "" );    	    
-}
 
 function getMapPosition3D2D( movement ){
 

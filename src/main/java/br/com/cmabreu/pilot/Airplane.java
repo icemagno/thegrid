@@ -1,21 +1,37 @@
 /**
  * Main Simulation thread. Runs a loop that recalculates simulation parameters periodically. 
- * The simulation interval can be set when the thread is started.
+ * The simulation simulationSpeed can be set when the thread is started.
  */
 package br.com.cmabreu.pilot;
 
 import java.util.Random;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
+import br.com.cmabreu.services.CommunicatorService;
+
 /**
  * @author Tony Mattheys
  *
  */
-public class Vessel extends Thread {
+public class Airplane extends Thread {
+	private CompassDeviation compassDeviation;
+	private CompassDeclination compassDeclination;
+	double relativeWindSpeed;
+	private double headingTrue;
+	private double headingMagnetic;
+	private double trueWindAngle ;
+	private double apparentWindSpeed;
+	private double apparentWindAngle;
+	private String latChar = "N";
+	private String lonChar = "E";	
+	private double altitude;
 	private double rudderFactor;
 	private int rudderPosition;
+	private int elevatorPosition;
 	private double throttlePosition;
-	private int interval;
+	private int simulationSpeed;
 	private double hullSpeed;
 	private double speed;
 	private double heading;
@@ -25,15 +41,18 @@ public class Vessel extends Thread {
 	private double trueWindDirection;
 	private double trueWindSpeed;
 	private double earthRadius = 3443.89849;
-	private GPSSimulator GPS;
 	private Random generator = new Random(System.nanoTime());
-	private AutoPilot pilot = null;
+	private Rudder rudder = null;
+	private Elevator elevator = null;
 	private String uuid;
 	private double targetAzimuth;
-	private double error;	
+	private double rudderError;
+	private double elevatorError;
+	private CommunicatorService comm;
+	private double targetAltitude;
 	
-	public int getInterval() {
-		return interval;
+	public int getSimulationSpeed() {
+		return simulationSpeed;
 	}	
 	
 	private double calcHullSpeed( int waterLineLengthMeters ) {
@@ -46,11 +65,11 @@ public class Vessel extends Thread {
 	/**
 	 * Initialize the Simulation
 	 */
-	public Vessel( IVesselObserver pilotObs, double lat, double lon ) {
-		this.rudderFactor = 1.0;
+	public Airplane( double lat, double lon, CommunicatorService comm, int simulationSpeed ) {
+		this.comm = comm;
+		this.rudderFactor = 2.0;
 		this.uuid = UUID.randomUUID().toString();
-		this.interval = 50;
-		this.GPS = new GPSSimulator( uuid, pilotObs, this.interval );
+		this.simulationSpeed = simulationSpeed;
 		this.hullSpeed = calcHullSpeed( 10 ); // 90 = ship length
 		this.speed = 0.0;
 		this.heading = 0.0;
@@ -58,15 +77,52 @@ public class Vessel extends Thread {
 		this.longitude = lon;
 		this.rudderPosition = 0;
 		this.throttlePosition = 0;
+		this.altitude = 5000;
 		this.trueWindDirection = generator.nextDouble() * 360;
 		this.trueWindSpeed = generator.nextDouble() * 20.0 + 5.0;
-		this.GPS.start();
-		this.pilot = new AutoPilot( 0.0, 0.01, 5.0, this );
-		pilot.start();
+		compassDeviation = new CompassDeviation();
+		compassDeclination = new CompassDeclination();	
+		this.rudder = new Rudder( 0.2, 0.0009, 0.0009, this );
+		rudder.start();
+		this.elevator = new Elevator(0.5, 0.0001, 20.0, this );
+		elevator.start();
 	}
 	
-	public void setError( double error ) {
-		this.error = error;
+	public double getAltitude() {
+		return altitude;
+	}
+	
+	public void setAltitude(double targetAltitude) {
+		this.targetAltitude = targetAltitude;
+		this.elevator.setAltitudeTo(targetAltitude);
+	}
+	
+	public synchronized void send(InfoProtocol info) {
+		info.setCurrentAzimuth( getHeading() );
+		info.setRudderError( getRudderError() );
+		info.setElevatorError( getElevatorError() );
+		info.setTargetAzimuth( getTargetAzimuth() );
+		info.setTargetAltitude( getTargetAltitude() );
+		info.setRudderPosition( getRudderPosition() );
+		info.setElevatorPosition( getElevatorPosition() );
+		JSONObject payload = new JSONObject( info );
+		try {
+			comm.broadcastData("main_channel", payload);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	public double getTargetAltitude() {
+		return targetAltitude;
+	}
+		
+	public double getElevatorError() {
+		return elevatorError;
+	}
+	
+	public void setRudderError( double error ) {
+		this.rudderError = error;
 	}
 	
 	public double getRudderFactor() {
@@ -77,41 +133,48 @@ public class Vessel extends Thread {
 		return targetAzimuth;
 	}
 	
-	public double getError() {
-		return error;
+	public double getRudderError() {
+		return rudderError;
 	}
 	
 	public String getUuid() {
 		return uuid;
 	}
 	
-	public void setPid( double p, double i, double d ) {
-		pilot.setPid(p,i,d);
+	public void setRudderPid( double p, double i, double d ) {
+		rudder.setPid(p,i,d);
 	}	
 
 	public void setCourseTo(double heading) {
 		this.targetAzimuth = heading;
-		pilot.setCourseTo( heading );
+		rudder.setCourseTo( heading );
 	}
 	
 	public void setRudderFactor(double rudderFactor) {
 		this.rudderFactor = rudderFactor;
 	}
 	
-	public void setInterval(int interval) {
-		this.interval = interval;
-		GPS.setUpdateSpeed( interval );
+	public void setSimulationSpeed(int simulationSpeed) {
+		this.simulationSpeed = simulationSpeed;
 	}
 	
 	public void setRudderPosition(Double p) {
 		rudderPosition = p.intValue();
 	}
 	
+	public void setElevatorPosition(Double p) {
+		elevatorPosition = p.intValue();
+	}
+	
+	public int getElevatorPosition() {
+		return elevatorPosition;
+	}
+
 	public int getRudderPosition() {
 		return rudderPosition;
 	}	
 
-	public void setThrottlePosition(double t) {
+	public void setThrottle(double t) {
 		throttlePosition = t;
 	}
 
@@ -132,28 +195,33 @@ public class Vessel extends Thread {
 	}
 
 	public double getHeadingMagnetic() {
-		return GPS.getHeadingMagnetic();
+		return headingMagnetic;
 	}
 
 	public double getTrueWindSpeed() {
-		return GPS.getTrueWindSpeed();
+		return trueWindSpeed;
 	}
 
 	public double getTrueWindAngle() {
-		return GPS.getTrueWindAngle();
+		return trueWindAngle;
 	}
 
 	public double getApparentWindSpeed() {
-		return GPS.getApparentWindSpeed();
+		return apparentWindSpeed;
 	}
 
 	public double getApparentWindAngle() {
-		return GPS.getApparentWindAngle();
+		return apparentWindAngle;
 	}
 
 	@Override
 	public void run() {
 		while (true) {
+			if (elevatorPosition != 0 && speed != 0  ) {
+				altitude = altitude + elevatorPosition;
+				if( altitude < 5 ) altitude = 5;
+			}
+			
 			/**
 			 * Gradually allow the boat speed to converge on the target speed
 			 * by adding half of the required delta in each iteration of the 
@@ -163,7 +231,6 @@ public class Vessel extends Thread {
 			if (throttlePosition >= 0) {
 				speed = speed + (((hullSpeed * throttlePosition / 100) - speed) / 2);
 			}
-			GPS.setSpeed(speed);
 
 			/**
 			 * Turn the boat in the direction indicated by the rudder. We multiply the
@@ -180,7 +247,6 @@ public class Vessel extends Thread {
 			if (heading >= 360) {
 				heading = heading - 360;
 			}
-			GPS.setHeading(heading);
 			/**
 			 * Add some instantaneous jitter to the wind speed and direction
 			 * Wind gusts randomly as much as 20% above and below the base number
@@ -196,7 +262,9 @@ public class Vessel extends Thread {
 			if (TWD < 0) {
 				TWD = TWD + 360;
 			}
-			GPS.setWind(TWS, TWD);
+			trueWindSpeed = TWS;
+			trueWindDirection = TWD;
+			
 			/**
 			 * To find the lat/lon of a point on true course t, distance d from (p1,l1) all in RADIANS
 			 * along a rhumbline (initial point cannot be a pole!):
@@ -213,20 +281,80 @@ public class Vessel extends Thread {
 			 * (d/R is the angular distance, in radians)
 			 * 
 			 */
-			displacement = speed * interval / 3600;
+			displacement = speed * simulationSpeed / 3600;
 			double p2 = Math.asin(Math.sin(Math.toRadians(latitude)) * Math.cos(displacement / earthRadius) + Math.cos(Math.toRadians(latitude)) * Math.sin(displacement / earthRadius) * Math.cos(Math.toRadians(heading)));
 			latitude = Math.toDegrees(p2);
-			GPS.setLatitude(latitude);
 			double l2 = Math.toRadians(longitude) + Math.atan2(Math.sin(Math.toRadians(heading)) * Math.sin(displacement / earthRadius) * Math.cos(Math.toRadians(latitude)), Math.cos(displacement / earthRadius) - Math.sin(Math.toRadians(latitude)) * Math.sin(p2));
 			longitude = Math.toDegrees(l2);
-			GPS.setLongitude(longitude);
+			
+			this.updateWindData();
+
+			this.send( new InfoProtocol( 
+					altitude, 
+					uuid, 
+					latitude, 
+					longitude, 
+					latChar, 
+					lonChar, 
+					headingTrue, 
+					headingMagnetic, 
+					speed,
+					speed * 1.852, 
+					relativeWindSpeed, 
+					trueWindSpeed, 
+					apparentWindSpeed, 
+					apparentWindAngle) 
+			);
+			
 			
 			try {
-				Thread.sleep((long) interval);
+				Thread.sleep((long) simulationSpeed);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 		}
 	}
+	
+	private void updateWindData() {
+		headingMagnetic = headingTrue + compassDeclination.FindDeclination(latitude, longitude) + compassDeviation.FindDeviation(headingTrue);
+
+		if (latitude > 0) {
+			latChar = "N";
+		} else {
+			latChar = "S";
+		}
+		
+		if (longitude > 0) {
+			lonChar = "E";
+		} else {
+			lonChar = "W";
+		}
+		
+		relativeWindSpeed = trueWindDirection - headingTrue;
+		if (relativeWindSpeed < 0) {
+			relativeWindSpeed = relativeWindSpeed + 360;
+		}
+		
+		trueWindAngle = relativeWindSpeed;
+		if (relativeWindSpeed > 180) {
+			trueWindAngle = relativeWindSpeed - 360 ;
+		}
+		
+		apparentWindSpeed = Math.sqrt(trueWindSpeed * trueWindSpeed + speed * speed + 2 * trueWindSpeed * speed * Math.cos(Math.toRadians(trueWindAngle)));
+		apparentWindAngle = Math.toDegrees(Math.acos((trueWindSpeed * Math.cos(Math.toRadians(trueWindAngle)) + speed) / apparentWindSpeed));
+		if (relativeWindSpeed > 180) {
+			apparentWindAngle = 360 - apparentWindAngle;
+		}
+
+	}
+
+	public void setElevatorError(double error) {
+		this.elevatorError = error;
+	}
+
+	public void setElevatorPid(Double p, Double i, Double d) {
+		elevator.setPid(p, i, d);
+	}
+	
 }
