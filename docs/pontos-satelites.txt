@@ -1,0 +1,152 @@
+const viewer = new Cesium.Viewer("cesiumContainer");
+const date = new Date();
+const threshold = 2000000;
+const scene = viewer.scene;
+
+//////////////////////////////////////////////////
+// CYLINDER LOGIC START///////////////////////////
+//////////////////////////////////////////////////
+
+// Cylinder geometries are initially centered on the origin.
+// We can use a model matrix to position the cylinder on the
+// globe surface.
+const length = 4000000.0;
+
+// Example 2: Draw a red cone and position with
+// a model matrix.
+let positionOnEllipsoid = Cesium.Cartesian3.fromDegrees(-105.0, 40.0);
+let modelMatrix = Cesium.Matrix4.multiplyByTranslation(
+  Cesium.Transforms.eastNorthUpToFixedFrame(positionOnEllipsoid),
+  new Cesium.Cartesian3(0.0, 0.0, length * 0.5),
+  new Cesium.Matrix4()
+);
+// Create the cylinder geometry.  To create a cone, set the
+// top radius to zero.
+let cylinderGeometry = new Cesium.CylinderGeometry({
+  length: length,
+  topRadius: 800000.0,
+  bottomRadius: 0,
+  vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+});
+// Create a geometry instance using the cylinder geometry
+// created above.
+const redCone = new Cesium.GeometryInstance({
+  geometry: cylinderGeometry,
+  modelMatrix: modelMatrix,
+  attributes: {
+    color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+      Cesium.Color.RED
+    ),
+  },
+});
+
+// Add both instances to primitives.
+scene.primitives.add(
+  new Cesium.Primitive({
+    geometryInstances: [redCone],
+    appearance: new Cesium.PerInstanceColorAppearance({
+      closed: true,
+      translucent: false,
+    }),
+  })
+);
+
+//////////////////////////////////////////////////
+// CYLINDER LOGIC END/////////////////////////////
+//////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////
+// POINT LOGIC START//////////////////////////////
+//////////////////////////////////////////////////
+
+
+class Point {
+  viewer;
+  posDegrees;
+  posCart;
+  pointPrim;
+  speed;
+  height;
+
+  constructor(viewer, posDegrees, speed, height) {
+    this.viewer = viewer;
+    this.posDegrees = posDegrees;
+    this.speed = speed;
+    this.height = height;
+
+    this.point = this.viewer.entities.add({
+      position: new Cesium.CallbackProperty((time, result) => {
+        this.posDegrees[0] =
+          this.posDegrees[0] + Math.cos(Date.parse(time) / speed);
+        this.posCart = Cesium.Cartesian3.fromDegrees(
+          this.posDegrees[0],
+          this.posDegrees[1],
+          this.height
+        );
+        return this.posCart;
+      }, false),
+      point: {
+        pixelSize: 5,
+        color: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 0,
+      },
+    });
+  }
+}
+
+const point1 = new Point(viewer, [-154, -29], 151, 5076290);
+const point2 = new Point(viewer, [33, 83], 1001, 7937560);
+const point3 = new Point(viewer, [-74, -22], 356, 5707260);
+const point4 = new Point(viewer, [156, 41], 452, 1775640);
+const point5 = new Point(viewer, [-152, -51], 147, 4567090);
+const point6 = new Point(viewer, [64, 37], 718, 5511340);
+const point7 = new Point(viewer, [-60, -71], 165, 8161870);
+const point8 = new Point(viewer, [35, 27], 741, 4295460);
+const point9 = new Point(viewer, [-73, -61], 428, 6493760);
+const point10 = new Point(viewer, [136, 62], 157, 3789020);
+const point11 = new Point(viewer, [-47, -45], 690, 1924060);
+const point12 = new Point(viewer, [99, 72], 99, 6263930);
+const point13 = new Point(viewer, [-123, -73], 753, 1961910);
+const point14 = new Point(viewer, [82, 70], 489, 9210590);
+const point15 = new Point(viewer, [-181, -37], 403, 7075510);
+const point16 = new Point(viewer, [149, 4], 337, 9110590);
+const point17 = new Point(viewer, [-104, -66], 803, 8343390);
+const point18 = new Point(viewer, [15, 41], 225, 1818700);
+const point19 = new Point(viewer, [-173, -81], 874, 3268810);
+const point20 = new Point(viewer, [121, 31], 792, 9450240);
+const point21 = new Point(viewer, [-23, -73], 415, 9538930);
+const point22 = new Point(viewer, [139, 64], 241, 7580550);
+const point23 = new Point(viewer, [-72, -17], 818, 6385560);
+const point24 = new Point(viewer, [106, 73], 921, 9412890);
+const point25 = new Point(viewer, [-4, -50], 365, 9589530);
+const point26 = new Point(viewer, [148, 22], 381, 4258270);
+const point27 = new Point(viewer, [-134, -17], 996, 2405090);
+const point28 = new Point(viewer, [75, 32], 289, 5117280);
+const point29 = new Point(viewer, [-53, -88], 229, 1553520);
+const point30 = new Point(viewer, [65, 37], 898, 8773390);
+const point31 = new Point(viewer, [-44, -52], 499, 5628940);
+const point32 = new Point(viewer, [8, 87], 961, 9364770);
+const point33 = new Point(viewer, [-131, -24], 67, 2173320);
+const point34 = new Point(viewer, [42, 35], 529, 3187560);
+const point35 = new Point(viewer, [-147, -23], 176, 1855540);
+const point36 = new Point(viewer, [180, 8], 361, 6110320);
+const point37 = new Point(viewer, [-125, -77], 275, 7307220);
+const point38 = new Point(viewer, [155, 78], 281, 2340920);
+const point39 = new Point(viewer, [-18, -36], 222, 4014220);
+const point40 = new Point(viewer, [110, 17], 290, 4856380);
+const point41 = new Point(viewer, [-130, -49], 506, 6154320);
+const point42 = new Point(viewer, [31, 71], 3, 3300310);
+const point43 = new Point(viewer, [-161, -6], 916, 7965330);
+const point44 = new Point(viewer, [163, 66], 475, 2078770);
+const point45 = new Point(viewer, [-164, -16], 555, 9416910);
+const point46 = new Point(viewer, [112, 9], 794, 9251290);
+const point47 = new Point(viewer, [-96, -77], 530, 6061690);
+const point48 = new Point(viewer, [169, 69], 367, 8491820);
+const point49 = new Point(viewer, [-175, -37], 436, 2395880);
+const point50 = new Point(viewer, [11, 58], 660, 6965660);
+
+//////////////////////////////////////////////////
+// POINT LOGIC END////////////////////////////////
+//////////////////////////////////////////////////
