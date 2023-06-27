@@ -96,9 +96,6 @@ function updatePlanes( payload ){
 	var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
 	var theOrientation = Cesium.Transforms.headingPitchRollQuaternion(thePosition, hpr);	
 	
-	// Temp
-	trackedPlane = payload.uuid;
-	
 	var found = false;
 	for( var xy=0; xy<airplanes.length; xy++  ) {
 		var planTemp = airplanes[xy];

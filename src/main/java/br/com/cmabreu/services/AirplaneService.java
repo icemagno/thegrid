@@ -16,22 +16,19 @@ public class AirplaneService  {
 	private final int SIMULATION_SPEED_DELAY = 50; // Delay interval between cicles
 	@Autowired private CommunicatorService comm;
 
-	public void spawn( double lon, double lat, long throttle ) {
+	public String spawn( double lon, double lat, long throttle, int alt ) {
 		Airplane airplane = new Airplane( lat, lon, comm, SIMULATION_SPEED_DELAY );
 		airplane.setThrottle( throttle );
+		airplane.setAltitude(alt);
 		airplane.start();		
-		
 		this.airplanes.put( airplane.getUuid(), airplane );
-
-		System.out.println( airplane.getUuid() );
+		return airplane.getUuid();
 	}
 	
 	
 	@PostConstruct
 	private void init() {
 		this.airplanes = new HashMap<String, Airplane>();
-
-		spawn( -43.1388, -22.9001, 50 );
 	}
 	
 	public void setThrottle( long speed, String uuid ) {

@@ -192,9 +192,14 @@ function addMouseHoverListener() {
 		    const pickedObject = this.viewer.scene.pick( movement.position );
 		    var pickedObjects = scene.drillPick(new Cesium.Cartesian2(movement.position.x, movement.position.y)); 
 		    if ( pickedObjects.length > 0 ) {
-		    	// showImageInfo( pickedObjects );
+		    	
+				$("#indicators").hide();
+				$("#padController").hide();
+		    	
+		    	console.log( pickedObjects );
 			} else {
-				// $("#sentinelResultPanel").hide();
+				$("#indicators").hide();
+				$("#padController").hide();
 			}			
 		} catch ( err ) {
 			// ignore
