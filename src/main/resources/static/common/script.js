@@ -138,26 +138,6 @@ function initMap(){
 		    endTransform: Cesium.Matrix4.IDENTITY
 		});			
 		
-		
-		/*
-		var promise = Cesium.GeoJsonDataSource.load( "/calisto/sentinel/polygonized.geojson", {
-			clampToGround: false,
-	        stroke: Cesium.Color.fromBytes(255, 0, 0, 254),
-	        fill: Cesium.Color.RED,
-	        strokeWidth: 2,	
-	   	});
-		promise.then(function(dataSource) {
-			var entities = dataSource.entities.values;
-			for (var i = 0; i < entities.length; i++) {
-				var entity = entities[i];
-				var entityPosition = entity.polygon.hierarchy._value.positions[0];
-				putMarker( entityPosition, "fire.png" )
-				entity.name = 'FIRE';
-			    viewer.entities.add( entity );
-			    scene.requestRender();
-			}	
-		});
-		*/
 			
 };
 
@@ -190,14 +170,11 @@ function addMouseHoverListener() {
 	mainEventHandler.setInputAction( function( movement ) {
 		try {
 		    const pickedObject = this.viewer.scene.pick( movement.position );
-		    var pickedObjects = scene.drillPick(new Cesium.Cartesian2(movement.position.x, movement.position.y)); 
-		    if ( pickedObjects.length > 0 ) {
-		    	
-				$("#indicators").hide();
-				$("#padController").hide();
-		    	
-		    	console.log( pickedObjects );
+		    if ( Cesium.defined( pickedObject ) ) {
+		    	setSelectedPlane( pickedObject.id.name );
+				$("#indicators").show();
 			} else {
+				unselectPlane();
 				$("#indicators").hide();
 				$("#padController").hide();
 			}			

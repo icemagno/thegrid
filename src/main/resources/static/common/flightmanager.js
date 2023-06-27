@@ -37,13 +37,34 @@ var airplanes = [];
 // http://localhost:8080/pilot/setpid?p=0.015&i=0.00001&d=0.05&uuid=0dbbca06-78a7-4ab4-a94e-dbbd193ab543
 // http://localhost:8080/pilot/setpid?p=0.02&i=0.00001&d=0.005&uuid=3a56f96c-7c02-4e28-85f6-e8c7d42c8bd4
 
-function updatePanelFooter( payload ) {
+function setSelectedPlane( plane ){
+	for( var xy=0; xy<airplanes.length; xy++  ) {
+		var planTemp = airplanes[xy];
+		if( planTemp.name == plane  ){
+			viewer.trackedEntity = planTemp;
+			break;
+		}
+	}
+}
+
+function unselectPlane(){
+	trackedPlane = null;
+	viewer.trackedEntity = null;
+}
+
+function updateHud( payload ) {
+	indicators.variometer.setVario( ( payload.rudderPosition / 10 ) * 4 );
+	indicators.heading.setHeading( payload.currentAzimuth );
+	indicators.airspeed.setAirSpeed( payload.speedKM * 10 );
+	indicators.altimeter.setAltitude( payload.altitude );
+    indicators.attitude.setRoll( payload.roll * 5 );
+    indicators.attitude.setPitch( payload.pitch );
+	indicators.turnCoordinator.setTurn( payload.roll * 5 );
+	
+	
 	var longitudeString = payload.longitude.toString();
 	var latitudeString = payload.latitude.toString();
-
 	var coordHDMS = convertDMS(latitudeString,longitudeString);
-	
-
 	$("#mapLat").text( payload.latitude.toFixed(5) );
 	$("#mapLon").text( payload.longitude.toFixed(5) );
 	var utmVal = fromLatLon( parseFloat(latitudeString), parseFloat(longitudeString));
@@ -59,7 +80,6 @@ function updatePanelFooter( payload ) {
 	$("#mapUtm").text( "" );    
 	$("#mapAlt").text( payload.altitude );
 	$("#mapHead").text( payload.currentAzimuth );
-
 }
 
 function planeUp(){
@@ -77,17 +97,6 @@ function planeRight(){
 
 
 function updatePlanes( payload ){
-	
-	indicators.variometer.setVario( ( payload.rudderPosition / 10 ) * 4 );
-	indicators.heading.setHeading( payload.currentAzimuth );
-	indicators.airspeed.setAirSpeed( payload.speedKM * 10 );
-	indicators.altimeter.setAltitude( payload.altitude );
-	
-    indicators.attitude.setRoll( payload.roll * 5 );
-    indicators.attitude.setPitch( payload.pitch );
-	indicators.turnCoordinator.setTurn( payload.roll * 5 );
-
-	updatePanelFooter(payload);
 	
 	var thePosition = Cesium.Cartesian3.fromDegrees( payload.longitude, payload.latitude, payload.altitude );					
 	var heading = Cesium.Math.toRadians( payload.currentAzimuth - 90 );
@@ -110,21 +119,7 @@ function updatePlanes( payload ){
 	//Create a completely random color
 	const color = Cesium.Color.fromRandom();
 
-	//Create a random shade of yellow.
-	const color1 = Cesium.Color.fromRandom({
-	    red : 1.0,
-	    green : 1.0,
-	    alpha : 1.0
-	});
 
-	//Create a random bright color.
-	const color2 = Cesium.Color.fromRandom({
-	    minimumRed : 0.75,
-	    minimumGreen : 0.75,
-	    minimumBlue : 0.75,
-	    alpha : 1.0
-	});	
-	
 	if( !found ){
 		var airPlane = new Cesium.Entity({
 			name : payload.uuid,
@@ -134,9 +129,7 @@ function updatePlanes( payload ){
 			model: {
 				uri: 'common/models/air.glb',
 				minimumPixelSize : 128,
-				maximumScale : 500,
-				color: color2
-
+				maximumScale : 500
 			}/*,
 			label: {
 				text: payload.uuid,
@@ -149,8 +142,9 @@ function updatePlanes( payload ){
 		});
 		airplanes.push( airPlane );
 		viewer.entities.add( airPlane );
-		viewer.trackedEntity = airPlane;
 	}	
-	
+
+	if( trackedPlane != null ) updateHud(payload);
+		
 }
 

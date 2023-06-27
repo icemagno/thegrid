@@ -1,5 +1,7 @@
 package br.com.cmabreu.pilot;
 
+import br.com.cmabreu.misc.CommandSource;
+
 public class InfoProtocol {
 	private String uuid;
 	private double latitude;
@@ -24,10 +26,13 @@ public class InfoProtocol {
 	private double altitude;
 	private double elevatorError;
 	private double targetAltitude;
+	private CommandSource cms;
+	private String positionHash;
+	private String sensorArea;
 
 	public InfoProtocol(double altitude, String uuid, double latitude, double longitude, String latChar, String lonChar, double headingTrue, 
 			double headingMagnetic, double speedKM, double speedKN, double relativeWindSpeed, double trueWindSpeed, 
-			double apparentWindSpeed, double apparentWindAngle ) {
+			double apparentWindSpeed, double apparentWindAngle, CommandSource cms ) {
 		this.latChar = latChar;
 		this.uuid = uuid;
 		this.latitude = latitude;
@@ -44,6 +49,22 @@ public class InfoProtocol {
 		this.roll = this.rudderPosition;
 		this.pitch = this.elevatorPosition;
 		this.altitude = altitude;
+	}
+	
+	public void setSensorArea(String sensorArea) {
+		this.sensorArea = sensorArea;
+	}
+	
+	public String getSensorArea() {
+		return sensorArea;
+	}
+	
+	public void setPositionHash(String positionHash) {
+		this.positionHash = positionHash;
+	}
+	
+	public String getPositionHash() {
+		return positionHash;
 	}
 	
 	public String getUuid() {
@@ -164,5 +185,12 @@ public class InfoProtocol {
 	public double getTargetAltitude() {
 		return targetAltitude;
 	}
+
+	public CommandSource getCms() {
+		return cms;
+	}
 	
+	public void setCms(CommandSource cms) {
+		this.cms = cms;
+	}
 }

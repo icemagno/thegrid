@@ -14,14 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+import br.com.cmabreu.misc.CommandSource;
+import br.com.cmabreu.misc.ProtocolCommand;
+
 @Service
 public class CommunicatorService {
 
-	@Autowired
-	private RabbitTemplate rabbitTemplate;
-	
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;	
+	@Autowired private RabbitTemplate rabbitTemplate;
+	@Autowired private SimpMessagingTemplate messagingTemplate;
+	@Autowired private AirplaneService airplaneService;
 	
 	@EventListener
 	public void onDisconnectEvent(SessionDisconnectEvent event) {
@@ -61,14 +62,51 @@ public class CommunicatorService {
     @RabbitListener( queues = {"main_channel"} )
     public void receive(@Payload String payload) {
     	try {
-    		// JSONObject inputProtocol = new JSONObject( payload );    
-   			//System.out.println( inputProtocol.toString(5) );
+    		JSONObject inputProtocol = new JSONObject( payload );    
+   			if( !inputProtocol.has("command") ) return;
+   			String command = inputProtocol.getString("command");
+   			ProtocolCommand pc = ProtocolCommand.valueOf(command);
+
+   			String uuid = inputProtocol.getString("uuid");
+   			long data = inputProtocol.getLong("value");
+   			
+   			switch (pc ) {
+				case PC_DOWN:
+					airplaneService.down(data, uuid);
+					break;
+				case PC_LEFT:
+					airplaneService.turnLeft(data, uuid);
+					break;
+				case PC_RIGHT:
+					airplaneService.turnRight(data, uuid);
+					break;
+				case PC_UP:
+					airplaneService.up(data, uuid);
+					break;
+				case PC_THROTTLE:
+					airplaneService.setThrottle(data, uuid);
+					break;
+				case PC_SPAWN:
+					spawnAirplane( inputProtocol );
+					break;
+				default:
+					break;
+			}
+   			
     	} catch ( Exception e ) {
     		e.printStackTrace();
     	}
     }	
 
-    @RabbitListener( queues = {"ping"} )
+    private void spawnAirplane(JSONObject inputProtocol) {
+    	double lat = inputProtocol.getDouble("lat");
+    	double lon = inputProtocol.getDouble("lon");
+    	int alt = inputProtocol.getInt("alt");
+    	long throttle = inputProtocol.getLong("throttle");
+		airplaneService.spawn(lon, lat, throttle, alt, CommandSource.CMS_MESSAGEQUEUE );
+	}
+
+	@RabbitListener( queues = {"ping"} )
     public void receivePing(@Payload String payload) {
     	try {
    			System.out.println( "PING RECEIVED!" );

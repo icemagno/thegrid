@@ -9,7 +9,10 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
+import br.com.cmabreu.misc.CommandSource;
+import br.com.cmabreu.radar.Radar;
 import br.com.cmabreu.services.CommunicatorService;
+import ch.hsr.geohash.GeoHash;
 
 /**
  * @author Tony Mattheys
@@ -50,6 +53,8 @@ public class Airplane extends Thread {
 	private double elevatorError;
 	private CommunicatorService comm;
 	private double targetAltitude;
+	private CommandSource cms;
+	private Radar radar;
 	
 	public int getSimulationSpeed() {
 		return simulationSpeed;
@@ -65,8 +70,9 @@ public class Airplane extends Thread {
 	/**
 	 * Initialize the Simulation
 	 */
-	public Airplane( double lat, double lon, CommunicatorService comm, int simulationSpeed ) {
+	public Airplane( double lat, double lon, CommunicatorService comm, int simulationSpeed, CommandSource cms ) {
 		this.comm = comm;
+		this.cms = cms;
 		this.rudderFactor = 2.0;
 		this.uuid = UUID.randomUUID().toString();
 		this.simulationSpeed = simulationSpeed;
@@ -86,6 +92,11 @@ public class Airplane extends Thread {
 		rudder.start();
 		this.elevator = new Elevator(0.5, 0.0001, 20.0, this );
 		elevator.start();
+		this.radar = new Radar( this );
+	}
+	
+	public String getPositionHash() {
+		return GeoHash.withCharacterPrecision( this.getLatitude(), this.getLongitude(), 7 ).toBase32();
 	}
 	
 	public double getAltitude() {
@@ -98,6 +109,8 @@ public class Airplane extends Thread {
 	}
 	
 	public synchronized void send(InfoProtocol info) {
+		info.setPositionHash( this.getPositionHash() );
+		info.setSensorArea( this.radar.getSensorArea() );
 		info.setCurrentAzimuth( getHeading() );
 		info.setRudderError( getRudderError() );
 		info.setElevatorError( getElevatorError() );
@@ -106,9 +119,7 @@ public class Airplane extends Thread {
 		info.setRudderPosition( getRudderPosition() );
 		info.setElevatorPosition( getElevatorPosition() );
 		JSONObject payload = new JSONObject( info );
-		try {
-			comm.broadcastData("main_channel", payload);
-		} catch (Exception e) {
+		try { comm.broadcastData("main_channel", payload); } catch (Exception e) {	
 			// TODO: handle exception
 		}
 	}
@@ -303,7 +314,8 @@ public class Airplane extends Thread {
 					relativeWindSpeed, 
 					trueWindSpeed, 
 					apparentWindSpeed, 
-					apparentWindAngle) 
+					apparentWindAngle,
+					this.cms) 
 			);
 			
 			
