@@ -42,6 +42,7 @@ function setSelectedPlane( plane ){
 		var planTemp = airplanes[xy];
 		if( planTemp.name == plane  ){
 			viewer.trackedEntity = planTemp;
+			trackedPlane = plane;
 			break;
 		}
 	}
@@ -53,6 +54,7 @@ function unselectPlane(){
 }
 
 function updateHud( payload ) {
+	if( payload.uuid != trackedPlane ) return;
 	indicators.variometer.setVario( ( payload.rudderPosition / 10 ) * 4 );
 	indicators.heading.setHeading( payload.currentAzimuth );
 	indicators.airspeed.setAirSpeed( payload.speedKM * 10 );
@@ -97,6 +99,7 @@ function planeRight(){
 
 
 function updatePlanes( payload ){
+	if( trackedPlane != null ) updateHud(payload);
 	
 	var thePosition = Cesium.Cartesian3.fromDegrees( payload.longitude, payload.latitude, payload.altitude );					
 	var heading = Cesium.Math.toRadians( payload.currentAzimuth - 90 );
@@ -144,7 +147,7 @@ function updatePlanes( payload ){
 		viewer.entities.add( airPlane );
 	}	
 
-	if( trackedPlane != null ) updateHud(payload);
+	
 		
 }
 

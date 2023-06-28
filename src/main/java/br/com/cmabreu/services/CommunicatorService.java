@@ -2,6 +2,8 @@ package br.com.cmabreu.services;
 
 import java.util.Calendar;
 
+import javax.annotation.PostConstruct;
+
 import org.json.JSONObject;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,6 +25,11 @@ public class CommunicatorService {
 	@Autowired private RabbitTemplate rabbitTemplate;
 	@Autowired private SimpMessagingTemplate messagingTemplate;
 	@Autowired private AirplaneService airplaneService;
+	
+	@PostConstruct
+	private void init() {
+		this.airplaneService.setCommunicator( this );
+	}
 	
 	@EventListener
 	public void onDisconnectEvent(SessionDisconnectEvent event) {
@@ -62,14 +69,17 @@ public class CommunicatorService {
     @RabbitListener( queues = {"main_channel"} )
     public void receive(@Payload String payload) {
     	try {
-    		JSONObject inputProtocol = new JSONObject( payload );    
+    		JSONObject inputProtocol = new JSONObject( payload );
    			if( !inputProtocol.has("command") ) return;
    			String command = inputProtocol.getString("command");
    			ProtocolCommand pc = ProtocolCommand.valueOf(command);
-
    			String uuid = inputProtocol.getString("uuid");
-   			long data = inputProtocol.getLong("value");
-   			
+   			long data = 0;
+   			if( inputProtocol.has("value") ) data = inputProtocol.getLong("value");
+
+    		System.out.println( inputProtocol.toString(5) );
+
+    		
    			switch (pc ) {
 				case PC_DOWN:
 					airplaneService.down(data, uuid);
@@ -99,11 +109,16 @@ public class CommunicatorService {
     }	
 
     private void spawnAirplane(JSONObject inputProtocol) {
-    	double lat = inputProtocol.getDouble("lat");
-    	double lon = inputProtocol.getDouble("lon");
-    	int alt = inputProtocol.getInt("alt");
-    	long throttle = inputProtocol.getLong("throttle");
-		airplaneService.spawn(lon, lat, throttle, alt, CommandSource.CMS_MESSAGEQUEUE );
+    	try {
+    		String uuid = inputProtocol.getString("uuid");
+	    	double lat = inputProtocol.getDouble("lat");
+	    	double lon = inputProtocol.getDouble("lon");
+	    	int alt = inputProtocol.getInt("alt");
+	    	long throttle = inputProtocol.getLong("throttle");
+			airplaneService.spawn(lon, lat, throttle, alt, CommandSource.CMS_MESSAGEQUEUE, uuid );
+    	} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@RabbitListener( queues = {"ping"} )

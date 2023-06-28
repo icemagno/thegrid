@@ -19,7 +19,7 @@ public class AirplaneController {
 	
     @GetMapping(value = "/spawn", produces=MediaType.APPLICATION_JSON_VALUE )
     public @ResponseBody String setSpeed( @RequestParam(value="lat",required=true) Long lat, @RequestParam(value="lon",required=true) Long lon, @RequestParam(value="alt",required=true) Integer alt ) {
-    	return airplaneService.spawn(lon, lat, 10, alt, CommandSource.CMS_REST);
+    	return airplaneService.spawn(lon, lat, 10, alt, CommandSource.CMS_REST, null);
     }	
 
 }

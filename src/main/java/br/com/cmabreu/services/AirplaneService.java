@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.cmabreu.misc.CommandSource;
@@ -14,12 +13,15 @@ import br.com.cmabreu.pilot.Airplane;
 @Service
 public class AirplaneService  {
 	private Map<String, Airplane> airplanes;
-	
 	private final int SIMULATION_SPEED_DELAY = 50; // Delay interval between cicles
-	@Autowired private CommunicatorService comm;
+	private CommunicatorService comm;
 
-	public String spawn( double lon, double lat, long throttle, int alt, CommandSource cms ) {
-		Airplane airplane = new Airplane( lat, lon, comm, SIMULATION_SPEED_DELAY, cms );
+	public void setCommunicator( CommunicatorService comm ) {
+		this.comm = comm;
+	}
+	
+	public String spawn( double lon, double lat, long throttle, int alt, CommandSource cms, String uuid ) {
+		Airplane airplane = new Airplane( lat, lon, comm, SIMULATION_SPEED_DELAY, cms, uuid );
 		airplane.setThrottle( throttle );
 		airplane.setAltitude(alt);
 		airplane.start();		

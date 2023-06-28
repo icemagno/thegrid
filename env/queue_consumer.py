@@ -16,7 +16,3 @@ def callback(ch, method, properties, body):
 channel.basic_consume('main_channel', callback, auto_ack=True)   
 channel.start_consuming()
 
-# Publish
-#channel.basic_publish(exchange='', routing_key='pdfprocess', body='User information')
-#print ("[x] Message sent to consumer")
-#connection.close()

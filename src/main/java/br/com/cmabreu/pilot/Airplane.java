@@ -69,12 +69,14 @@ public class Airplane extends Thread {
 	
 	/**
 	 * Initialize the Simulation
+	 * @param uuid 
 	 */
-	public Airplane( double lat, double lon, CommunicatorService comm, int simulationSpeed, CommandSource cms ) {
+	public Airplane( double lat, double lon, CommunicatorService comm, int simulationSpeed, CommandSource cms, String uuid ) {
+		if( uuid == null ) uuid = UUID.randomUUID().toString();
 		this.comm = comm;
 		this.cms = cms;
 		this.rudderFactor = 2.0;
-		this.uuid = UUID.randomUUID().toString();
+		this.uuid = uuid;
 		this.simulationSpeed = simulationSpeed;
 		this.hullSpeed = calcHullSpeed( 10 ); // 90 = ship length
 		this.speed = 0.0;
