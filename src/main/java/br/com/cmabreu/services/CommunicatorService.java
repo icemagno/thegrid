@@ -50,7 +50,19 @@ public class CommunicatorService {
     	// To websocket
     	messagingTemplate.convertAndSend("/" + channel, data.toString() );
 	}
+	
+	public void sendToWS( String channel, JSONObject data ) throws Exception {
+		data.put("timestamp", Calendar.getInstance().getTimeInMillis() );
+    	// To websocket
+    	messagingTemplate.convertAndSend("/" + channel, data.toString() );
+	}	
 
+	public void sendToRabbit( String channel, JSONObject data ) throws Exception {
+		data.put("timestamp", Calendar.getInstance().getTimeInMillis() );
+		// To Rabbit-MQ
+		rabbitTemplate.convertAndSend( channel, data.toString() );
+	}	
+	
 	public void onDisconnect(SessionDisconnectEvent event) {
 		String sessionId = new JSONObject( event.getMessage().getHeaders() ).getString("simpSessionId");
 		System.out.println( "[" + sessionId +  "]  Recebido pelo CommController: DISCONNECT EVENT" );

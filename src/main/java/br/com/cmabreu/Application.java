@@ -31,10 +31,15 @@ public class Application {
 
     
     @Bean
+    public Queue createMDLPDataChannel() {
+        return new Queue("mdlp_map_simulacao", true);
+    }	    
+
+    @Bean
     public Queue createAirplaneDataChannel() {
         return new Queue("grid_airplane_data", true);
-    }	    
-   
+    }    
+    
     @Bean
     public Queue createAirplaneCommandChannel() {
         return new Queue("grid_airplane_commands", true);

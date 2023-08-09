@@ -121,8 +121,12 @@ public class Airplane extends Thread {
 		info.setRudderPosition( getRudderPosition() );
 		info.setElevatorPosition( getElevatorPosition() );
 		JSONObject payload = new JSONObject( info );
-		try { comm.broadcastData("grid_airplane_data", payload); } catch (Exception e) {	
-			// TODO: handle exception
+		
+		try { 
+			comm.sendToRabbit("mdlp_map_simulacao", payload);
+			comm.sendToWS("grid_airplane_data", payload); 
+		} catch (Exception e) {	
+			
 		}
 	}
 	
