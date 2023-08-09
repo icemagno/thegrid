@@ -65,9 +65,19 @@ public class CommunicatorService {
 		System.out.println( "[" + sessionId +  "]  Recebido pelo CommController: " );
 		System.out.println( message );
 	}	
-	
+
     @RabbitListener( queues = {"main_channel"} )
-    public void receive(@Payload String payload) {
+    public void receiveAll(@Payload String payload) {
+    	//
+    }
+	
+    @RabbitListener( queues = {"grid_airplane_data"} )
+    public void receiveAirplaneData(@Payload String payload) {
+    	//
+    }
+	
+    @RabbitListener( queues = {"grid_airplane_commands"} )
+    public void receiveCommands(@Payload String payload) {
     	try {
     		JSONObject inputProtocol = new JSONObject( payload );
    			if( !inputProtocol.has("command") ) return;
@@ -79,7 +89,6 @@ public class CommunicatorService {
 
     		System.out.println( inputProtocol.toString(5) );
 
-    		
    			switch (pc ) {
 				case PC_DOWN:
 					airplaneService.down(data, uuid);
@@ -121,13 +130,6 @@ public class CommunicatorService {
 		}
 	}
 
-	@RabbitListener( queues = {"ping"} )
-    public void receivePing(@Payload String payload) {
-    	try {
-   			System.out.println( "PING RECEIVED!" );
-    	} catch ( Exception e ) {
-    		e.printStackTrace();
-    	}
-    }	    
+   
     
 }

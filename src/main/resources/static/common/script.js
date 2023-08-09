@@ -35,7 +35,7 @@ function connectWs() {
       	});
 
       	
-      	stompClient.subscribe('/main_channel', (message) => {
+      	stompClient.subscribe('/grid_airplane_data', (message) => {
       		if(message.body) {
       			var payload = JSON.parse(message.body);
       			// flightmamager.js

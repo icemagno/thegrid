@@ -121,7 +121,7 @@ public class Airplane extends Thread {
 		info.setRudderPosition( getRudderPosition() );
 		info.setElevatorPosition( getElevatorPosition() );
 		JSONObject payload = new JSONObject( info );
-		try { comm.broadcastData("main_channel", payload); } catch (Exception e) {	
+		try { comm.broadcastData("grid_airplane_data", payload); } catch (Exception e) {	
 			// TODO: handle exception
 		}
 	}

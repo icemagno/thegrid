@@ -43,6 +43,7 @@ function setSelectedPlane( plane ){
 		if( planTemp.name == plane  ){
 			viewer.trackedEntity = planTemp;
 			trackedPlane = plane;
+			$("#padpanel").show();
 			break;
 		}
 	}
@@ -51,6 +52,7 @@ function setSelectedPlane( plane ){
 function unselectPlane(){
 	trackedPlane = null;
 	viewer.trackedEntity = null;
+	$("#padpanel").hide();
 }
 
 function updateHud( payload ) {

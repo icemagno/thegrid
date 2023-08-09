@@ -13,7 +13,7 @@ import br.com.cmabreu.pilot.Airplane;
 @Service
 public class AirplaneService  {
 	private Map<String, Airplane> airplanes;
-	private final int SIMULATION_SPEED_DELAY = 50; // Delay interval between cicles
+	private final int SIMULATION_SPEED_DELAY = 100; // Delay interval between cicles
 	private CommunicatorService comm;
 
 	public void setCommunicator( CommunicatorService comm ) {

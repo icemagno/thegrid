@@ -29,9 +29,15 @@ public class Application {
         return new Queue("main_channel", true);
     }	
 
+    
     @Bean
-    public Queue createPingChannel() {
-        return new Queue("ping", true);
+    public Queue createAirplaneDataChannel() {
+        return new Queue("grid_airplane_data", true);
+    }	    
+   
+    @Bean
+    public Queue createAirplaneCommandChannel() {
+        return new Queue("grid_airplane_commands", true);
     }	    
     
 }
